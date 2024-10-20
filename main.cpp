@@ -4,9 +4,32 @@
 
 using namespace std;
 
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define RESET "\033[0m"
+
 // g++ main.cpp -o main && ./main < input.txt
 // g++ main.cpp -o main && ./main < input.txt
 // g++ main.cpp -o main && ./main < input.txt
+
+// cout << GREEN << "+ Merge: " << RESET
+
+void printVector(const vector<int>& v, int comeco, int fim) {
+    cout << "[ ";
+    for (int i = comeco; i <= fim; i++) {
+        cout << v[i] << " ";
+    }
+    cout << "]" << endl;
+}
+
+void printVectorFull(vector<int>& vec)
+{
+    for (int v : vec)
+    {
+        cout << v << " ";
+    }
+    cout << endl;
+}
 
 void merge(vector<int>& v, int comeco, int meio, int fim) {
     int com1 = comeco, com2 = meio+1, comAux = 0, tam = fim-comeco+1;
@@ -40,23 +63,20 @@ void merge(vector<int>& v, int comeco, int meio, int fim) {
     }
 }
 
-void mergeSort(vector<int>& v, int comeco, int fim){
+void mergeSort(vector<int>& v, int comeco, int fim, int depth = 0){
+    string indent = string(depth * 4, ' ');
+    cout << indent;
+    printVector(v, comeco, fim);
+
     if (comeco < fim) {
         int meio = (fim+comeco)/2;
 
-        mergeSort(v, comeco, meio);
-        mergeSort(v, meio+1, fim);
+        mergeSort(v, comeco, meio, depth + 1);
+        mergeSort(v, meio+1, fim, depth + 1);
         merge(v, comeco, meio, fim);
-    }
-}
 
-void printVector(vector<int>& vec)
-{
-    for (int v : vec)
-    {
-        cout << v << " ";
+        printVector(v, comeco, fim);
     }
-    cout << endl;
 }
 
 int main()
@@ -82,13 +102,13 @@ int main()
     }
 
     cout << "Input: " << endl;
-    printVector(numeros);
+    printVectorFull(numeros);
     cout << endl;
 
     mergeSort(numeros, 0, numeros.size()-1);
 
     cout << "Output: " << endl;
-    printVector(numeros);
+    printVectorFull(numeros);
     cout << endl;
 
     return 0;
