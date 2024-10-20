@@ -59,11 +59,13 @@ int main() {
     clearScreen();
 
     vector<double> mergeTimes;
+    vector<double> iMergeTimes;
     vector<double> quickTimes;
     vector<double> shellTimes;
     vector<double> beadTimes;
 
     vector<int> mergeVec = numeros;
+    vector<int> iMergeVec = numeros;
     vector<int> quickVec = numeros;
     vector<int> shellVec = numeros;
     int* beadVec = new int[numeros.size()];
@@ -74,6 +76,7 @@ int main() {
 
     for (int i = 0; i < ITERATIONS; i++) {
         mergeVec = numeros;
+        iMergeVec = numeros;
         quickVec = numeros;
         shellVec = numeros;
         copy(numeros.begin(), numeros.end(), beadVec);
@@ -83,6 +86,12 @@ int main() {
         mergeSort(mergeVec, 0, mergeVec.size() - 1);
         auto end = chrono::high_resolution_clock::now();
         mergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
+
+        // Iterative MergeSort timing
+        start = chrono::high_resolution_clock::now();
+        iterativeMergeSort(iMergeVec);
+        end = chrono::high_resolution_clock::now();
+        iMergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
 
         // QuickSort timing
         start = chrono::high_resolution_clock::now();
@@ -104,15 +113,17 @@ int main() {
     }
 
     double mergeAvg = accumulate(mergeTimes.begin(), mergeTimes.end(), 0.0) / ITERATIONS;
+    double iMergeAvg = accumulate(iMergeTimes.begin(), iMergeTimes.end(), 0.0) / ITERATIONS;
     double quickAvg = accumulate(quickTimes.begin(), quickTimes.end(), 0.0) / ITERATIONS;
     double shellAvg = accumulate(shellTimes.begin(), shellTimes.end(), 0.0) / ITERATIONS;
     double beadAvg = accumulate(beadTimes.begin(), beadTimes.end(), 0.0) / ITERATIONS;
 
     cout << "Sorted: ";
-    printVectorFull(mergeVec);
+    printVectorFull(shellVec);
     cout << endl;
 
     printExecutionTime(mergeAvg, "MergeSort");
+    printExecutionTime(iMergeAvg, "ItMergeSort");
     printExecutionTime(quickAvg, "QuickSort");
     printExecutionTime(shellAvg, "ShellSort");
     printExecutionTime(beadAvg, "BeadSort");

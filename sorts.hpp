@@ -110,6 +110,20 @@ void mergeSort(vector<int>& v, int low, int high) {
     }
 }
 
+void iterativeMergeSort(vector<int>& v) {
+    int n = v.size();
+
+    for (int curr_size = 1; curr_size <= n - 1; curr_size *= 2) {
+        for (int low = 0; low < n - 1; low += 2 * curr_size) {
+            
+            int mid = min(low + curr_size - 1, n - 1);
+            int high = min(low + 2 * curr_size - 1, n - 1);
+
+            merge(v, low, mid, high);
+        }
+    }
+}
+
 void shellSort(vector<int>& v, int low, int high) {
     int n = high - low + 1;
 
