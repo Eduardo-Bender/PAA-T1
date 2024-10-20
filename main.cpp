@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -14,7 +15,17 @@ using namespace std;
 
 // cout << GREEN << "+ Merge: " << RESET
 
-void printVector(const vector<int>& v, int comeco, int fim) {
+void printVectorDivide(const vector<int>& v, int comeco, int fim) {
+    cout << "[ ";
+    for (int i = comeco; i <= fim; i++) {
+        if(i == (fim+comeco)/2+1) cout << RED << "/ " << RESET;
+        cout << v[i] << " ";
+    }
+    cout << "]" << endl;
+}
+
+void printVectorMerge(const vector<int>& v, int comeco, int fim) {
+    cout << GREEN << "+ Merge: " << RESET;
     cout << "[ ";
     for (int i = comeco; i <= fim; i++) {
         cout << v[i] << " ";
@@ -66,7 +77,7 @@ void merge(vector<int>& v, int comeco, int meio, int fim) {
 void mergeSort(vector<int>& v, int comeco, int fim, int depth = 0){
     string indent = string(depth * 4, ' ');
     cout << indent;
-    printVector(v, comeco, fim);
+    printVectorDivide(v, comeco, fim);
 
     if (comeco < fim) {
         int meio = (fim+comeco)/2;
@@ -75,12 +86,14 @@ void mergeSort(vector<int>& v, int comeco, int fim, int depth = 0){
         mergeSort(v, meio+1, fim, depth + 1);
         merge(v, comeco, meio, fim);
 
-        printVector(v, comeco, fim);
+        printVectorMerge(v, comeco, fim);
     }
 }
 
 int main()
 {
+    auto start = chrono::high_resolution_clock::now();
+
     vector<int> numeros;
     string input;
 
@@ -110,6 +123,10 @@ int main()
     cout << "Output: " << endl;
     printVectorFull(numeros);
     cout << endl;
+
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> duration = end - start;
+    cout << "Tempo de execucao: " << duration.count() << " ms" << endl;
 
     return 0;
 }
