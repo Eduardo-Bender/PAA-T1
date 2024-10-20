@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <iostream>
-#include <vector>
-
-using namespace std;
+#include "sorts.hpp"
 
 #define RED "\033[31m"
 #define GREEN "\033[32m"
@@ -31,56 +27,7 @@ void printVectorFull(vector<int>& vec)
     cout << endl;
 }
 
-void merge(vector<int>& v, int comeco, int meio, int fim) {
-    int com1 = comeco, com2 = meio+1, comAux = 0, tam = fim-comeco+1;
-    vector<int> vAux(tam);
-
-    while(com1 <= meio && com2 <= fim){
-        if(v[com1] < v[com2]) {
-            vAux[comAux] = v[com1];
-            com1++;
-        } else {
-            vAux[comAux] = v[com2];
-            com2++;
-        }
-        comAux++;
-    }
-
-    while(com1 <= meio){ 
-        vAux[comAux] = v[com1];
-        comAux++;
-        com1++;
-    }
-
-    while(com2 <= fim) {  
-        vAux[comAux] = v[com2];
-        comAux++;
-        com2++;
-    }
-
-    for(comAux = comeco; comAux <= fim; comAux++){   
-        v[comAux] = vAux[comAux-comeco];
-    }
-}
-
-void mergeSort(vector<int>& v, int comeco, int fim, int depth = 0){
-    string indent = string(depth * 4, ' ');
-    cout << indent;
-    printVector(v, comeco, fim);
-
-    if (comeco < fim) {
-        int meio = (fim+comeco)/2;
-
-        mergeSort(v, comeco, meio, depth + 1);
-        mergeSort(v, meio+1, fim, depth + 1);
-        merge(v, comeco, meio, fim);
-
-        printVector(v, comeco, fim);
-    }
-}
-
-int main()
-{
+int main() {
     vector<int> numeros;
     string input;
 
@@ -101,15 +48,23 @@ int main()
         }
     }
 
-    cout << "Input: " << endl;
-    printVectorFull(numeros);
-    cout << endl;
+    cout << "Original: ";
+    printVector(numeros, 0, numeros.size() - 1);
 
-    mergeSort(numeros, 0, numeros.size()-1);
+    vector<int> mergeVec = numeros;
+    mergeSort(mergeVec, 0, mergeVec.size() - 1);
+    cout << "MergeSort: ";
+    printVector(mergeVec, 0, mergeVec.size() - 1);
 
-    cout << "Output: " << endl;
-    printVectorFull(numeros);
-    cout << endl;
+    vector<int> quickVec = numeros;
+    quickSort(quickVec, 0, quickVec.size() - 1);
+    cout << "QuickSort: ";
+    printVector(quickVec, 0, quickVec.size() - 1);
+
+    vector<int> shellVec = numeros;
+    shellSort(shellVec, 0, shellVec.size() - 1);
+    cout << "ShellSort: ";
+    printVector(shellVec, 0, shellVec.size() - 1);
 
     return 0;
 }
