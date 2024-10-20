@@ -4,6 +4,8 @@
 #define GREEN "\033[32m"
 #define RESET "\033[0m"
 
+using namespace std;
+
 // g++ main.cpp -o main && ./main < input.txt
 // g++ main.cpp -o main && ./main < input.txt
 // g++ main.cpp -o main && ./main < input.txt
@@ -59,22 +61,22 @@ int main() {
     }
 
     cout << "Original: ";
-    printVector(numeros, 0, numeros.size() - 1);
+    printVectorFull(numeros);
 
     vector<int> mergeVec = numeros;
     mergeSort(mergeVec, 0, mergeVec.size() - 1);
     cout << "MergeSort: ";
-    printVector(mergeVec, 0, mergeVec.size() - 1);
+    printVectorFull(mergeVec);
 
     vector<int> quickVec = numeros;
     quickSort(quickVec, 0, quickVec.size() - 1);
     cout << "QuickSort: ";
-    printVector(quickVec, 0, quickVec.size() - 1);
+    printVectorFull(quickVec);
 
     vector<int> shellVec = numeros;
     shellSort(shellVec, 0, shellVec.size() - 1);
     cout << "ShellSort: ";
-    printVector(shellVec, 0, shellVec.size() - 1);
+    printVectorFull(shellVec);
 
     return 0;
 }
