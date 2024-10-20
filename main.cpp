@@ -6,9 +6,12 @@ using namespace std;
 // g++ main.cpp -o main && ./main < input.txt
 // g++ main.cpp -o main && ./main < input.txt
 
-// cout << GREEN << "+ Merge: " << RESET
+// o arquivo de input recebe, para gerar um vetor aleatorio, respectivamente:
+// Numero de elementos;
+// Limite inferior;
+// Limite superior.
 
-#define ITERATIONS 100000
+#define ITERATIONS 100
 
 void clearScreen()
 {
@@ -34,39 +37,46 @@ void printExecutionTime(double duration, string sort)
 }
 
 int main() {
-    vector<int> numeros;
-    string input;
+    int numCount, lowerBound, upperBound;
 
-    cout << "Digite os numeros (digite X para parar): " << endl << endl;
+    cout << "Digite o numero de elementos: ";
+    cin >> numCount;
 
-    while (true) {
-        cin >> input;
-        
-        if (input == "X" || input == "x") {
-            break;
-        }
+    cout << "Digite o limite inferior: ";
+    cin >> lowerBound;
 
-        try {
-            int valor = stoi(input); 
-            numeros.push_back(valor);
-        } catch (invalid_argument& e) {
-            cout << "Entrada invalida. Digite um numero ou X para parar." << endl;
-        }
+    cout << "Digite o limite superior: ";
+    cin >> upperBound;
+
+    vector<int> numeros(numCount);
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> distr(lowerBound, upperBound);
+
+    for (int i = 0; i < numCount; ++i) {
+        numeros[i] = distr(gen);
     }
     clearScreen();
 
     vector<double> mergeTimes;
     vector<double> quickTimes;
     vector<double> shellTimes;
+    vector<double> beadTimes;
+
+    vector<int> mergeVec = numeros;
+    vector<int> quickVec = numeros;
+    vector<int> shellVec = numeros;
+    int* beadVec = new int[numeros.size()];
 
     cout << "Original: ";
     printVectorFull(numeros);
     cout << endl;
 
     for (int i = 0; i < ITERATIONS; i++) {
-        vector<int> mergeVec = numeros;
-        vector<int> quickVec = numeros;
-        vector<int> shellVec = numeros;
+        mergeVec = numeros;
+        quickVec = numeros;
+        shellVec = numeros;
+        copy(numeros.begin(), numeros.end(), beadVec);
 
         // MergeSort timing
         auto start = chrono::high_resolution_clock::now();
@@ -85,19 +95,28 @@ int main() {
         shellSort(shellVec, 0, shellVec.size() - 1);
         end = chrono::high_resolution_clock::now();
         shellTimes.push_back(chrono::duration<double, milli>(end - start).count());
+
+        // BeadSort timing
+        start = chrono::high_resolution_clock::now();
+        beadSort(beadVec, numeros.size());
+        end = chrono::high_resolution_clock::now();
+        beadTimes.push_back(chrono::duration<double, milli>(end - start).count());
     }
 
     double mergeAvg = accumulate(mergeTimes.begin(), mergeTimes.end(), 0.0) / ITERATIONS;
     double quickAvg = accumulate(quickTimes.begin(), quickTimes.end(), 0.0) / ITERATIONS;
     double shellAvg = accumulate(shellTimes.begin(), shellTimes.end(), 0.0) / ITERATIONS;
+    double beadAvg = accumulate(beadTimes.begin(), beadTimes.end(), 0.0) / ITERATIONS;
+
+    cout << "Sorted: ";
+    printVectorFull(mergeVec);
+    cout << endl;
 
     printExecutionTime(mergeAvg, "MergeSort");
     printExecutionTime(quickAvg, "QuickSort");
     printExecutionTime(shellAvg, "ShellSort");
+    printExecutionTime(beadAvg, "BeadSort");
 
-    cout << "Sorted: ";
-    printVectorFull(numeros);
-    cout << endl;
 
     return 0;
 }

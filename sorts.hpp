@@ -4,6 +4,8 @@
 #include <chrono>
 #include <cstdlib>
 #include <numeric>
+#include <random>
+#include <algorithm>
 using namespace std;
 
 #define RED "\033[31m"
@@ -121,4 +123,34 @@ void shellSort(vector<int>& v, int low, int high) {
             v[j] = temp;
         }
     }
+}
+
+void beadSort(int *a, int len)
+{
+	int i, j, max, sum;
+	unsigned char *beads;
+       #define BEAD(i, j) beads[i * max + j]
+ 
+	for (i = 1, max = a[0]; i < len; i++)
+		if (a[i] > max) max = a[i];
+ 
+	beads = (unsigned char*)calloc(1, max * len);
+ 
+	for (i = 0; i < len; i++)
+		for (j = 0; j < a[i]; j++)
+			BEAD(i, j) = 1;
+ 
+	for (j = 0; j < max; j++) {
+		for (sum = i = 0; i < len; i++) {
+			sum += BEAD(i, j);
+			BEAD(i, j) = 0;
+		}
+		for (i = len - sum; i < len; i++) BEAD(i, j) = 1;
+	}
+ 
+	for (i = 0; i < len; i++) {
+		for (j = 0; j < max && BEAD(i, j); j++);
+		a[i] = j;
+	}
+	free(beads);
 }
