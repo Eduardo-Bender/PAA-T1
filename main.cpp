@@ -23,6 +23,17 @@ void printVectorDivide(const vector<int>& v, int comeco, int fim) {
 
 void printVectorMerge(const vector<int>& v, int comeco, int fim) {
     cout << GREEN << "+ Merge: " << RESET;
+void printVectorDivide(const vector<int>& v, int comeco, int fim) {
+    cout << "[ ";
+    for (int i = comeco; i <= fim; i++) {
+        if(i == (fim+comeco)/2+1) cout << RED << "/ " << RESET;
+        cout << v[i] << " ";
+    }
+    cout << "]" << endl;
+}
+
+void printVectorMerge(const vector<int>& v, int comeco, int fim) {
+    cout << GREEN << "+ Merge: " << RESET;
     cout << "[ ";
     for (int i = comeco; i <= fim; i++) {
         cout << v[i] << " ";
