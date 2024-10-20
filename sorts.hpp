@@ -1,7 +1,33 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <cstdlib>
+#include <numeric>
 using namespace std;
+
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define RESET "\033[0m"
+
+void printVectorDivide(const vector<int>& v, int comeco, int fim) {
+    cout << "[ ";
+    for (int i = comeco; i <= fim; i++) {
+        if(i == (fim+comeco)/2+1) cout << RED << "/ " << RESET;
+        cout << v[i] << " ";
+    }
+    cout << "]" << endl;
+}
+
+void printVectorMerge(const vector<int>& v, int comeco, int fim) {
+    cout << GREEN << "+ Merge: " << RESET;
+    cout << "[ ";
+    for (int i = comeco; i <= fim; i++) {
+        cout << v[i] << " ";
+    }
+    cout << "]" << endl;
+}
+
 
 void swap(int& a, int& b) {
     int temp = a;

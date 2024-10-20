@@ -1,9 +1,5 @@
 #include "sorts.hpp"
 
-#define RED "\033[31m"
-#define GREEN "\033[32m"
-#define RESET "\033[0m"
-
 using namespace std;
 
 // g++ main.cpp -o main && ./main < input.txt
@@ -12,33 +8,15 @@ using namespace std;
 
 // cout << GREEN << "+ Merge: " << RESET
 
-void printVectorDivide(const vector<int>& v, int comeco, int fim) {
-    cout << "[ ";
-    for (int i = comeco; i <= fim; i++) {
-        if(i == (fim+comeco)/2+1) cout << RED << "/ " << RESET;
-        cout << v[i] << " ";
-    }
-    cout << "]" << endl;
-}
+#define ITERATIONS 100000
 
-void printVectorMerge(const vector<int>& v, int comeco, int fim) {
-    cout << GREEN << "+ Merge: " << RESET;
-void printVectorDivide(const vector<int>& v, int comeco, int fim) {
-    cout << "[ ";
-    for (int i = comeco; i <= fim; i++) {
-        if(i == (fim+comeco)/2+1) cout << RED << "/ " << RESET;
-        cout << v[i] << " ";
-    }
-    cout << "]" << endl;
-}
-
-void printVectorMerge(const vector<int>& v, int comeco, int fim) {
-    cout << GREEN << "+ Merge: " << RESET;
-    cout << "[ ";
-    for (int i = comeco; i <= fim; i++) {
-        cout << v[i] << " ";
-    }
-    cout << "]" << endl;
+void clearScreen()
+{
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
 }
 
 void printVectorFull(vector<int>& vec)
@@ -50,11 +28,16 @@ void printVectorFull(vector<int>& vec)
     cout << endl;
 }
 
+void printExecutionTime(double duration, string sort)
+{
+    cout << "Tempo de execucao do " << sort << ": " << GREEN << duration << RESET << " ms"  << endl;
+}
+
 int main() {
     vector<int> numeros;
     string input;
 
-    cout << "Digite os numeros (digite X para parar): " << endl;
+    cout << "Digite os numeros (digite X para parar): " << endl << endl;
 
     while (true) {
         cin >> input;
@@ -70,24 +53,51 @@ int main() {
             cout << "Entrada invalida. Digite um numero ou X para parar." << endl;
         }
     }
+    clearScreen();
+
+    vector<double> mergeTimes;
+    vector<double> quickTimes;
+    vector<double> shellTimes;
 
     cout << "Original: ";
     printVectorFull(numeros);
+    cout << endl;
 
-    vector<int> mergeVec = numeros;
-    mergeSort(mergeVec, 0, mergeVec.size() - 1);
-    cout << "MergeSort: ";
-    printVectorFull(mergeVec);
+    for (int i = 0; i < ITERATIONS; i++) {
+        vector<int> mergeVec = numeros;
+        vector<int> quickVec = numeros;
+        vector<int> shellVec = numeros;
 
-    vector<int> quickVec = numeros;
-    quickSort(quickVec, 0, quickVec.size() - 1);
-    cout << "QuickSort: ";
-    printVectorFull(quickVec);
+        // MergeSort timing
+        auto start = chrono::high_resolution_clock::now();
+        mergeSort(mergeVec, 0, mergeVec.size() - 1);
+        auto end = chrono::high_resolution_clock::now();
+        mergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
 
-    vector<int> shellVec = numeros;
-    shellSort(shellVec, 0, shellVec.size() - 1);
-    cout << "ShellSort: ";
-    printVectorFull(shellVec);
+        // QuickSort timing
+        start = chrono::high_resolution_clock::now();
+        quickSort(quickVec, 0, quickVec.size() - 1);
+        end = chrono::high_resolution_clock::now();
+        quickTimes.push_back(chrono::duration<double, milli>(end - start).count());
+
+        // ShellSort timing
+        start = chrono::high_resolution_clock::now();
+        shellSort(shellVec, 0, shellVec.size() - 1);
+        end = chrono::high_resolution_clock::now();
+        shellTimes.push_back(chrono::duration<double, milli>(end - start).count());
+    }
+
+    double mergeAvg = accumulate(mergeTimes.begin(), mergeTimes.end(), 0.0) / ITERATIONS;
+    double quickAvg = accumulate(quickTimes.begin(), quickTimes.end(), 0.0) / ITERATIONS;
+    double shellAvg = accumulate(shellTimes.begin(), shellTimes.end(), 0.0) / ITERATIONS;
+
+    printExecutionTime(mergeAvg, "MergeSort");
+    printExecutionTime(quickAvg, "QuickSort");
+    printExecutionTime(shellAvg, "ShellSort");
+
+    cout << "Sorted: ";
+    printVectorFull(numeros);
+    cout << endl;
 
     return 0;
 }
