@@ -1,2 +1,2 @@
 g++ main.cpp -o main
-.\main < input.txt
+.\main < average.txt
