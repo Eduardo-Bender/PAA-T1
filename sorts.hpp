@@ -63,11 +63,9 @@ void quickSort(vector<int>& v, int low, int high) {
     }
 }
 
-void merge(vector<int>& v, int low, int mid, int high) {
+void merge(vector<int>& v, int low, int mid, int high, vector<int>& left, vector<int>& right) {
     int n1 = mid - low + 1;
     int n2 = high - mid;
-
-    vector<int> left(n1), right(n2);
 
     for (int i = 0; i < n1; i++) {
         left[i] = v[low + i];
@@ -101,25 +99,37 @@ void merge(vector<int>& v, int low, int mid, int high) {
     }
 }
 
-void mergeSort(vector<int>& v, int low, int high) {
+
+void mergeSortIdk(vector<int>& v, int low, int high, vector<int>& left, vector<int>& right) {
     if (low < high) {
         int mid = low + (high - low) / 2;
-        mergeSort(v, low, mid);
-        mergeSort(v, mid + 1, high);
-        merge(v, low, mid, high);
+        mergeSortIdk(v, low, mid, left, right);
+        mergeSortIdk(v, mid + 1, high, left, right);
+        merge(v, low, mid, high, left, right);
     }
+}
+
+void mergeSort(vector<int>& v, int low, int high)
+{
+    int n = v.size();
+    vector<int> left(n / 2 + 1), right(n / 2 + 1);
+    mergeSortIdk(v, low, high, left, right);
 }
 
 void iterativeMergeSort(vector<int>& v) {
     int n = v.size();
-
+    
     for (int curr_size = 1; curr_size <= n - 1; curr_size *= 2) {
         for (int low = 0; low < n - 1; low += 2 * curr_size) {
             
             int mid = min(low + curr_size - 1, n - 1);
             int high = min(low + 2 * curr_size - 1, n - 1);
 
-            merge(v, low, mid, high);
+            vector<int> left(mid - low + 1);
+            vector<int> right(high - mid);
+
+
+            merge(v, low, mid, high, left, right);
         }
     }
 }

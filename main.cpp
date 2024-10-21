@@ -6,7 +6,7 @@ using namespace std;
 // g++ main.cpp -o main && ./main < input.txt
 // g++ main.cpp -o main && ./main < input.txt
 
-#define ITERATIONS 100
+#define ITERATIONS 10
 
 void clearScreen()
 {
@@ -72,7 +72,7 @@ int main() {
         iterativeMergeSort(iMergeVec);
         end = chrono::high_resolution_clock::now();
         iMergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
-
+        
         // QuickSort timing
         start = chrono::high_resolution_clock::now();
         quickSort(quickVec, 0, quickVec.size() - 1);
