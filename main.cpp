@@ -39,15 +39,19 @@ int main() {
         numeros.push_back(n);
     }
 
+    int numThreads = thread::hardware_concurrency();
+
     clearScreen();
 
     vector<double> mergeTimes;
-    vector<double> iMergeTimes;
+    vector<double> iterativeMergeTimes;
+    vector<double> parallelMergeTimes;
     vector<double> quickTimes;
     vector<double> shellTimes;
 
     vector<int> mergeVec = numeros;
-    vector<int> iMergeVec = numeros;
+    vector<int> iterativeMergeVec = numeros;
+    vector<int> parallelMergeVec = numeros;
     vector<int> quickVec = numeros;
     vector<int> shellVec = numeros;
 
@@ -57,7 +61,8 @@ int main() {
 
     for (int i = 0; i < ITERATIONS; i++) {
         mergeVec = numeros;
-        iMergeVec = numeros;
+        iterativeMergeVec = numeros;
+        parallelMergeVec = numeros;
         quickVec = numeros;
         shellVec = numeros;
 
@@ -67,11 +72,17 @@ int main() {
         auto end = chrono::high_resolution_clock::now();
         mergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
 
+        // Parallel MergeSort timing
+        start = chrono::high_resolution_clock::now();
+        parallelMergeSort(parallelMergeVec, 0, parallelMergeVec.size() - 1, numThreads);
+        end = chrono::high_resolution_clock::now();
+        parallelMergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
+
         // Iterative MergeSort timing
         start = chrono::high_resolution_clock::now();
-        iterativeMergeSort(iMergeVec);
+        iterativeMergeSort(iterativeMergeVec);
         end = chrono::high_resolution_clock::now();
-        iMergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
+        iterativeMergeTimes.push_back(chrono::duration<double, milli>(end - start).count());
         
         // QuickSort timing
         start = chrono::high_resolution_clock::now();
@@ -87,7 +98,8 @@ int main() {
     }
 
     double mergeAvg = accumulate(mergeTimes.begin(), mergeTimes.end(), 0.0) / ITERATIONS;
-    double iMergeAvg = accumulate(iMergeTimes.begin(), iMergeTimes.end(), 0.0) / ITERATIONS;
+    double iterativeMergeAvg = accumulate(iterativeMergeTimes.begin(), iterativeMergeTimes.end(), 0.0) / ITERATIONS;
+    double parallelMergeAvg = accumulate(parallelMergeTimes.begin(), parallelMergeTimes.end(), 0.0) / ITERATIONS;
     double quickAvg = accumulate(quickTimes.begin(), quickTimes.end(), 0.0) / ITERATIONS;
     double shellAvg = accumulate(shellTimes.begin(), shellTimes.end(), 0.0) / ITERATIONS;
 
@@ -96,7 +108,8 @@ int main() {
     cout << endl;*/
 
     printExecutionTime(mergeAvg, "MergeSort");
-    printExecutionTime(iMergeAvg, "ItMergeSort");
+    printExecutionTime(iterativeMergeAvg, "ItMergeSort");
+    printExecutionTime(parallelMergeAvg, "ParallelMergeSort");
     printExecutionTime(quickAvg, "QuickSort");
     printExecutionTime(shellAvg, "ShellSort");
 

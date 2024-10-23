@@ -6,11 +6,15 @@
 #include <numeric>
 #include <random>
 #include <algorithm>
+#include <mutex>
+#include <thread>
 using namespace std;
 
 #define RED "\033[31m"
 #define GREEN "\033[32m"
 #define RESET "\033[0m"
+
+mutex mtx;
 
 void printVectorDivide(const vector<int>& v, int comeco, int fim) {
     cout << "[ ";
@@ -114,6 +118,25 @@ void mergeSort(vector<int>& v, int low, int high)
     int n = v.size();
     vector<int> left(n / 2 + 1), right(n / 2 + 1);
     mergeSortIdk(v, low, high, left, right);
+}
+
+void parallelMergeSort(vector<int>& v, int low, int high, int numThreads) {
+    if (numThreads <= 1) {
+        mergeSort(v, low, high);
+        return;
+    }
+    
+    int n = v.size();
+    vector<int> left(n / 2 + 1), right(n / 2 + 1);
+    int mid = low + (high - low) / 2;
+
+    thread leftThread(mergeSortIdk, ref(v), low, mid, ref(left), ref(right));
+    thread rightThread(mergeSortIdk, ref(v), mid + 1, high, ref(left), ref(right));
+
+    leftThread.join();
+    rightThread.join();
+
+    merge(v, low, mid, high, left, right);
 }
 
 void iterativeMergeSort(vector<int>& v) {
