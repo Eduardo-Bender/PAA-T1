@@ -67,35 +67,43 @@ void quickSort(vector<int>& v, int low, int high) {
     }
 }
 
-void merge(vector<int>& v, int low, int mid, int high, vector<int>& left, vector<int>& right) {
-    int n1 = mid - low + 1;
-    int n2 = high - mid;
+void merge(vector<int>& v, int low, int mid, int high, vector<int>& left, vector<int>& right) { // Conquista
+    
+    int n1 = mid - low + 1; // n de elementos no subarray esquerdo 
+
+    int n2 = high - mid; // n de elementos no subarray direito
 
     for (int i = 0; i < n1; i++) {
-        left[i] = v[low + i];
+        left[i] = v[low + i]; // Copia os elementos do subarray esquerdo para o array auxiliar
     }
+    
+    
     for (int i = 0; i < n2; i++) {
-        right[i] = v[mid + 1 + i];
+        right[i] = v[mid + 1 + i]; // Copia os elementos do subarray direito para o array auxiliar
     }
 
     int i = 0, j = 0, k = low;
+
+    // Compara os elementos de left e right, e os coloca de volta em v em ordem
     while (i < n1 && j < n2) {
         if (left[i] <= right[j]) {
-            v[k] = left[i];
+            v[k] = left[i]; // Se o elemento do lado esquerdo for menor ou igual
             i++;
         } else {
-            v[k] = right[j];
+            v[k] = right[j]; // Caso contrário, o elemento do lado direito é inserido
             j++;
         }
         k++;
     }
 
+    // Se ainda restarem elementos no subarray left
     while (i < n1) {
         v[k] = left[i];
         i++;
         k++;
     }
 
+    // Se ainda restarem elementos no subarray right
     while (j < n2) {
         v[k] = right[j];
         j++;
@@ -103,21 +111,26 @@ void merge(vector<int>& v, int low, int mid, int high, vector<int>& left, vector
     }
 }
 
-
-void mergeSortIdk(vector<int>& v, int low, int high, vector<int>& left, vector<int>& right) {
+void mergeSortIdk(vector<int>& v, int low, int high, vector<int>& left, vector<int>& right) { // Divisao
     if (low < high) {
-        int mid = low + (high - low) / 2;
-        mergeSortIdk(v, low, mid, left, right);
-        mergeSortIdk(v, mid + 1, high, left, right);
-        merge(v, low, mid, high, left, right);
+        
+        int mid = low + (high - low) / 2; // Encontra o meio do array
+        
+        mergeSortIdk(v, low, mid, left, right); // Recursivamente ordena o subarray esquerdo (de low a mid)
+
+        mergeSortIdk(v, mid + 1, high, left, right); // Recursivamente ordena o subarray direito (da posição mid + 1 a high)
+        
+        merge(v, low, mid, high, left, right);  // Junta os dois subarrays ordenados
     }
 }
 
-void mergeSort(vector<int>& v, int low, int high)
-{
+void mergeSort(vector<int>& v, int low, int high) {
     int n = v.size();
+    
+    // Arrays auxiliares para armazenar temporariamente os subarrays e diminuir o tempo gasto com alocação de espaço
     vector<int> left(n / 2 + 1), right(n / 2 + 1);
-    mergeSortIdk(v, low, high, left, right);
+    
+    mergeSortIdk(v, low, high, left, right); // Chama a função recursiva de ordenação
 }
 
 void parallelMergeSort(vector<int>& v, int low, int high, int numThreads) {
