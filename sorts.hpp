@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <mutex>
 #include <thread>
+#include <map>
 using namespace std;
 
 #define RED "\033[31m"
@@ -16,24 +17,161 @@ using namespace std;
 
 mutex mtx;
 
-void printVectorDivide(const vector<int>& v, int comeco, int fim) {
-    cout << "[ ";
-    for (int i = comeco; i <= fim; i++) {
-        if(i == (fim+comeco)/2+1) cout << RED << "/ " << RESET;
-        cout << v[i] << " ";
+struct SubarrayPair {
+    vector<int> leftSubarray;
+    vector<int> rightSubarray;
+};
+
+map<int, vector<SubarrayPair>> depthMap;
+
+void splitArray(vector<int>& v, int low, int high, int depth = 0) {
+    if (low < high) {
+        int mid = low + (high - low) / 2;
+
+        SubarrayPair currentSplit;
+        currentSplit.leftSubarray = vector<int>(v.begin() + low, v.begin() + mid + 1);
+        currentSplit.rightSubarray = vector<int>(v.begin() + mid + 1, v.begin() + high + 1);
+
+        depthMap[depth].push_back(currentSplit);
+
+        splitArray(v, low, mid, depth + 1);
+        splitArray(v, mid + 1, high, depth + 1);
     }
-    cout << "]" << endl;
 }
 
-void printVectorMerge(const vector<int>& v, int comeco, int fim) {
-    cout << GREEN << "+ Merge: " << RESET;
-    cout << "[ ";
-    for (int i = comeco; i <= fim; i++) {
-        cout << v[i] << " ";
+void merge(vector<int>& v, int low, int mid, int high, vector<int>& left, vector<int>& right);
+void leftPrintableSortDivide(vector<int>& v, int low, int high, vector<int>& left, vector<int>& right, int depth);
+void rightPrintableSortDivide(vector<int>& v, int low, int high, vector<int>& left, vector<int>& right, int depth);
+
+void printLowestSubarrays() {
+    // Find the deepest depth level
+    if (depthMap.empty()) return;  // No data in the depth map
+
+    // Get the last element in depthMap (deepest level)
+    int maxDepth = depthMap.rbegin()->first;
+    for (const auto& subarrayPair : depthMap[maxDepth]) {
+        const auto& leftSubarray = subarrayPair.leftSubarray;
+        const auto& rightSubarray = subarrayPair.rightSubarray;
+
+        // Since we're at the deepest level, both subarrays should have only one element
+        if (leftSubarray.size() == 1) {
+            cout << "[" << leftSubarray[0] << "]  ";
+        }
+        if (rightSubarray.size() == 1) {
+            cout << "[" << rightSubarray[0] << "]  ";
+        }
     }
-    cout << "]" << endl;
+    cout << endl << endl;
 }
 
+void printMapDivide()
+{
+    for (const auto& [depth, subarrayPairs] : depthMap) {
+        int spaces = max(1, 8 - depth*3);  // Ensure at least 1 space
+        for (int i = 0; i < spaces; i++) {
+                cout << " ";
+            }
+        for (const auto& subarrayPair : subarrayPairs) {
+            const auto& leftSubarray = subarrayPair.leftSubarray;
+            const auto& rightSubarray = subarrayPair.rightSubarray;
+
+
+            // Print the left subarray
+            cout << "[";
+            for (const int& val : leftSubarray) {
+                cout << val << " ";
+            }
+
+
+            cout << RED << "/" << RESET;
+
+            // Print the right subarray
+            for (const int& val : rightSubarray) {
+                cout << " "<< val;
+            }
+            cout << "] ";
+
+        }
+        cout << "\n\n";
+            
+    }
+}
+
+void printMapMerge()
+{
+    // Iterate from the bottom-most depth to the top (reverse order)
+    for (auto it = depthMap.rbegin(); it != depthMap.rend(); ++it) {
+        const auto& [depth, subarrayPairs] = *it;
+        
+        int spaces = max(1, 8 - depth*3);  // Ensure at least 1 space
+        for (int i = 0; i < spaces; i++) {
+            cout << " ";
+        }
+        
+        for (const auto& subarrayPair : subarrayPairs) {
+            const auto& leftSubarray = subarrayPair.leftSubarray;
+            const auto& rightSubarray = subarrayPair.rightSubarray;
+
+            // Print the left subarray
+            cout << "[";
+            for (const int& val : leftSubarray) {
+                cout << val << " ";
+            }
+
+            // Use green "+" symbol instead of red "/"
+            cout << GREEN << "+" << RESET;
+
+            // Print the right subarray
+            for (const int& val : rightSubarray) {
+                cout << " " << val;
+            }
+            cout << "] ";
+        }
+        cout << "\n\n";
+    }
+    cout << endl;
+}
+
+void printableMergeSort(vector<int>& v, int low, int high) {
+    int n = v.size();
+    
+    // Arrays auxiliares para armazenar temporariamente os subarrays e diminuir o tempo gasto com alocação de espaço
+    vector<int> left(n / 2 + 1), right(n / 2 + 1);
+    splitArray(v, low, high, 0);
+    if (low < high) {
+        
+        int mid = low + (high - low) / 2; // Encontra o meio do array
+        
+        leftPrintableSortDivide(v, low, mid, left, right, 1); // Recursivamente ordena o subarray esquerdo (de low a mid)
+
+        rightPrintableSortDivide(v, mid + 1, high, left, right, 1); // Recursivamente ordena o subarray direito (da posição mid + 1 a high)
+        
+        merge(v, low, mid, high, left, right);  // Junta os dois subarrays ordenados
+    }
+    printMapDivide();
+    printLowestSubarrays();
+    printMapMerge();
+}
+
+void leftPrintableSortDivide(vector<int>& v, int low, int high, vector<int>& left, vector<int>& right, int depth = 0)
+{
+    if (low < high) {
+        int mid = low + (high - low) / 2; // Encontra o meio do array
+        leftPrintableSortDivide(v, low, mid, left, right, depth + 1); // Recursively sort the left subarray
+        rightPrintableSortDivide(v, mid + 1, high, left, right, depth + 1); // Recursively sort the right subarray
+        merge(v, low, mid, high, left, right); // Merge the two subarrays
+    }
+}
+
+void rightPrintableSortDivide(vector<int>& v, int low, int high, vector<int>& left, vector<int>& right, int depth = 0)
+{
+    if (low < high) {
+        int mid = low + (high - low) / 2; // Find the middle of the array
+        leftPrintableSortDivide(v, low, mid, left, right, depth + 1); // Recursively sort the left subarray
+        rightPrintableSortDivide(v, mid + 1, high, left, right, depth + 1); // Recursively sort the right subarray
+        merge(v, low, mid, high, left, right); // Merge the two subarrays
+    }
+}
 
 void swap(int& a, int& b) {
     int temp = a;
@@ -183,34 +321,4 @@ void shellSort(vector<int>& v, int low, int high) {
             v[j] = temp;
         }
     }
-}
-
-void beadSort(int *a, int len)
-{
-	int i, j, max, sum;
-	unsigned char *beads;
-       #define BEAD(i, j) beads[i * max + j]
- 
-	for (i = 1, max = a[0]; i < len; i++)
-		if (a[i] > max) max = a[i];
- 
-	beads = (unsigned char*)calloc(1, max * len);
- 
-	for (i = 0; i < len; i++)
-		for (j = 0; j < a[i]; j++)
-			BEAD(i, j) = 1;
- 
-	for (j = 0; j < max; j++) {
-		for (sum = i = 0; i < len; i++) {
-			sum += BEAD(i, j);
-			BEAD(i, j) = 0;
-		}
-		for (i = len - sum; i < len; i++) BEAD(i, j) = 1;
-	}
- 
-	for (i = 0; i < len; i++) {
-		for (j = 0; j < max && BEAD(i, j); j++);
-		a[i] = j;
-	}
-	free(beads);
 }

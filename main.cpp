@@ -43,6 +43,9 @@ int main() {
 
     clearScreen();
 
+    vector<int> printMN = {2, 3, 4, 5, 6, 7, 8, 9};
+    printableMergeSort(printMN, 0, printMN.size() - 1);
+
     vector<double> mergeTimes;
     vector<double> iterativeMergeTimes;
     vector<double> parallelMergeTimes;
